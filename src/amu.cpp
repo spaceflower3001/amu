@@ -13,7 +13,16 @@ const char *menu_logo[4] =
  " \\__,_||_| |_| |_| \\__,_|"
 };
 
+void draw_logo()
+{
+  int y = (LINES - 4) / 2;
+  int x = (COLS - 25) / 2;
 
+  for (int i = 0; i < 4; i++) 
+  {
+	  mvprintw(y + i, x, menu_logo[i]);
+  }
+}
 
 int main() 
 {
@@ -22,12 +31,8 @@ int main()
     cbreak(); // disable line buffering
     curs_set(0); // hide cursor
 
-    int y = (LINES - 4) / 2;
-    int x = (COLS - 25) / 2;
+    draw_logo();
 
-    for (int i = 0; i < 4; i++) {
-        mvprintw(y + i, x, menu_logo[i]);
-    }
     getch(); // wait for user input
 
     endwin(); // end ncurses
