@@ -1,10 +1,6 @@
 // spaceflower3001
 
-#include <iostream>
 #include <ncurses.h>
-#include <string>
-#include <locale>
-#include <cwchar>
 
 const char *menu_logo[4] = 
 {
@@ -25,19 +21,18 @@ void draw_logo()
 	}
 }
 
-int main() 
+int main(void) 
 {
-	initscr(); // initialize ncurses
-	noecho(); // don't echo user input
-	cbreak(); // disable line buffering
+	initscr();   // initialize ncurses
+	noecho();    // don't echo user input
+	cbreak();    // disable line buffering
 	curs_set(0); // hide cursor
 
-	refresh();
 
 	draw_logo();
 
-	getch(); // wait for user input
+	getch();     // wait for user input
 
-	endwin(); // end ncurses
+	endwin();    // end ncurses
 	return 0;
 }
