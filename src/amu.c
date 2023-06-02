@@ -1,6 +1,16 @@
-// spaceflower3001
+/* 
+	~ spaceflower3001
+	~ GNU GPLv3
+	~ spaceflower3001@gmail.com
+*/
 
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
 #include <ncurses.h>
+
+// Window width * height
+int w, h;
 
 const char *menu_logo[4] = 
 {
