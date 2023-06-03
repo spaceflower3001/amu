@@ -13,16 +13,14 @@
 // Window width * height
 int w, h;
 
-// Const Color
+// Const color
 const short c_hud = 1;
 
-//////////////////
-//  COLORSHEME
-//////////////////
 // Set color
-void set_color() {
-    start_color();
-    init_pair(c_hud,   COLOR_BLUE,     COLOR_BLACK);
+void set_color() 
+{
+	start_color();
+    	init_pair(c_hud,  COLOR_BLUE, COLOR_BLACK);
 }
 
 const char *menu_logo[4] = 
@@ -46,12 +44,12 @@ void draw_logo()
 
 int main(void) 
 {
-	initscr();             // Initialize ncurses library
-	noecho();    	       // Don't echo user input
-	cbreak();    	       // Disable line buffering
-	curs_set(0); 	       // Hide cursor
-    	keypad(stdscr, TRUE);  // Enable keypad mode
-	leaveok(stdscr, TRUE); // Control cursor behavior between windows
+	initscr();             		// Initialize ncurses library
+	noecho();    	       		// Don't echo user input
+	cbreak();    	       		// Disable line buffering
+	curs_set(0); 	       		// Hide cursor
+    	keypad(stdscr, TRUE);  		// Enable keypad mode
+	leaveok(stdscr, TRUE);		// Control cursor behavior between windows
 
 	// If terminal does not support color
 	if (!has_colors()) 
@@ -63,12 +61,13 @@ int main(void)
 	// Enable color support
 	set_color();
 
+	// Game state
 	typedef enum 
 	{
-        	STATE_MENU,
-        	STATE_INFO,
-	        STATE_GAME,
-        	STATE_EXIT,
+        	MENU,
+        	CONTROLS,
+	        GAME,
+        	FIN,
 	} game_state;
 	
 	// Init current state
@@ -79,11 +78,12 @@ int main(void)
 	attron(COLOR_PAIR(c_hud));
 	box(stdscr, 0, 0);
 
+	// Draw amu logo
 	draw_logo();
 
-	getch();     // Wait for user input
+	getch();     			// Wait for user input
 
-	endwin();    // End ncurses
+	endwin();    			// End ncurses
 
 	return 0;
 }
