@@ -72,7 +72,7 @@ int main(void)
 	
 	// Init current state
 	game_state current_state;
-    	current_state = STATE_MENU;
+    	current_state = MENU;
 
 	// Draw window border hud
 	attron(COLOR_PAIR(c_hud));
