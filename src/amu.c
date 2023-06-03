@@ -16,6 +16,15 @@ int w, h;
 // Const Color
 const short c_hud = 1;
 
+//////////////////
+//  COLORSHEME
+//////////////////
+// Set color
+void set_color() {
+    start_color();
+    init_pair(c_hud,   COLOR_BLUE,     COLOR_BLACK);
+}
+
 const char *menu_logo[4] = 
 {
 	"  __ _  _ __ ___   _   _ ",
@@ -48,8 +57,11 @@ int main(void)
 	if (!has_colors()) 
 	{
 		endwin();
-		printf("Your terminal does not support color\n");
+		printf("Your terminal does not support colors. Please enable colors to play this game.\n");
 	}
+
+	// Enable color support
+	set_color();
 
 	typedef enum 
 	{
@@ -63,10 +75,9 @@ int main(void)
 	game_state current_state;
     	current_state = STATE_MENU;
 
-	// Draw box
+	// Draw window border hud
 	attron(COLOR_PAIR(c_hud));
 	box(stdscr, 0, 0);
-	attron(COLOR_PAIR(c_hud));
 
 	draw_logo();
 
