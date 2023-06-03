@@ -23,7 +23,7 @@ void set_color()
     	init_pair(c_hud,  COLOR_BLUE, COLOR_BLACK);
 }
 
-const char *menu_logo[4] = 
+const char *logo[4] = 
 {
 	"  __ _  _ __ ___   _   _ ",
 	" / _` || '_ ` _ | | | | |",
@@ -38,7 +38,7 @@ void draw_logo()
 
 	for (int i = 0; i < 4; i++) 
 	{
-		mvprintw(y + i, x, menu_logo[i]);
+		mvprintw(y + i, x, logo[i]);
 	}
 }
 
