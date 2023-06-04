@@ -23,16 +23,58 @@ void set_color()
     	init_pair(c_hud,  COLOR_BLUE, COLOR_BLACK);
 }
 
-const char *logo[4] = 
+void draw_finger()
 {
-	"  __ _  _ __ ___   _   _ ",
-	" / _` || '_ ` _ | | | | |",
-	"| (_| || | | | | || |_| |",
-	" \\__,_||_| |_| |_| \\__,_|"
-};
+	const char *finger[21] =
+	{
+		"				     .",                                                                   
+		"				    :==-",                                                                  
+		"				  :=++==-.",                                                                
+		"			       .::-::::::::",                                                              
+		"			  ....:::::.    ..::.",                                                             
+		"		     .:==-::::::-:::..  .:::-.",                                                           
+		"		   :=**++++=------::::..::::",                                                          
+		"		 -**#*+++*++=-==---:::--::.",                                                            
+		"	       -###**+++**++==========---.",
+		"	     :*###*+++++++=--+===---===-.",                                                                
+		"	   -*##**##**++=-...-.   :--=-.",                                                               
+		"	 .*##****+***+=: .:::    .--.",                                                                 
+		"	-##+++=:  +**+-:-=-:.:-:.::",                                                                   
+		"       +*+++:    +#*+=-+++=-=++==+:",                                                                      
+		"     .**==-      :**++***++***++=.:",                                                                    
+		"     .+=-.         :--. -+=-.::.",                                                                      
+		" ........",                                                                             
+		" .------:",                                                                                                    
+		" .-ENTER:",                                                                                                      
+		" :------:",                                                                                                     
+		" ::::::::"
+	};
+
+	// Set up timer
+	timeout(100);
+
+	// Loop through each line of the hand gesture
+	for (int i = 0; i < 21; i++) 
+	{
+		// Print the line of the hand gesture
+		mvprintw(i, 0, "%s", finger[i]);
+		refresh();
+
+		// Delay
+		usleep(50000); // 50ms delay
+	}
+}
 
 void draw_logo()
 {
+	const char *logo[4] = 
+	{
+		"  __ _  _ __ ___   _   _ ",
+		" / _` || '_ ` _ | | | | |",
+		"| (_| || | | | | || |_| |",
+		" \\__,_||_| |_| |_| \\__,_|"
+	};
+
 	int y = (LINES - 4) / 2;
 	int x = (COLS - 25) / 2;
 
@@ -41,6 +83,20 @@ void draw_logo()
 		mvprintw(y + i, x, logo[i]);
 	}
 }
+
+// Check next lvl
+/*
+bool next_lvl(short current_lvl[][arr_size_x]) 
+{
+    if (current_lvl[player.y][player.x] == i_exit)
+    {
+        level = level + 1;
+        return true;
+    }
+
+    return false;
+}
+*/
 
 int main(void) 
 {
@@ -79,7 +135,9 @@ int main(void)
 	box(stdscr, 0, 0);
 
 	// Draw amu logo
-	draw_logo();
+	//draw_logo();
+	
+	draw_finger();
 
 	getch();     			// Wait for user input
 
