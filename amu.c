@@ -11,9 +11,6 @@
 #include <unistd.h>
 #include <ncurses.h>
 
-// Window width * height
-int w, h;
-
 // Const color
 const short c_hud = 1;
 
@@ -57,13 +54,19 @@ void draw_finger()
 	// Loop through each line of the hand gesture
 	for (int i = 0; i < 21; i++) 
 	{
+		// Center Finger ASCII
+		int y = (LINES - 21) / 2;
+		int x = (COLS - 53) / 2;
+
 		// Print the line of the hand gesture
-		mvprintw(i, 0, "%s", finger[i]);
+		mvprintw(y + i, x, "%s", finger[i]);
 		refresh();
 
 		// Delay
 		usleep(50000); // 50ms delay
 	}
+
+	usleep(100000); // 100ms delay to see finished anim
 }
 
 void draw_logo()
@@ -76,9 +79,11 @@ void draw_logo()
 		" \\__,_||_| |_| |_| \\__,_|"
 	};
 
+	// Center Title ASCII
 	int y = (LINES - 4) / 2;
 	int x = (COLS - 25) / 2;
 
+	// Print title
 	for (int i = 0; i < 4; i++) 
 	{
 		mvprintw(y + i, x, logo[i]);
@@ -135,9 +140,6 @@ int main(void)
 	attron(COLOR_PAIR(c_hud));
 	box(stdscr, 0, 0);
 
-	// Draw amu logo
-	//draw_logo();
-	
 	draw_finger();
 
 	getch();     			// Wait for user input
