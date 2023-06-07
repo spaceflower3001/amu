@@ -120,8 +120,6 @@ int main(void)
 		printf("Your terminal does not support colors. Please enable colors to play this game.\n");
 	}
 
-	// Enable color support
-	set_color();
 
 	// Game state
 	typedef enum 
@@ -140,7 +138,18 @@ int main(void)
 	attron(COLOR_PAIR(c_hud));
 	box(stdscr, 0, 0);
 
-	draw_finger();
+	// MAIN LOOP
+	while (current_state != FIN)
+	{
+		// Enable color support
+		set_color();
+
+		switch(current_state)
+		{
+			case MENU:
+				draw_finger();
+		}
+	}
 
 	getch();     			// Wait for user input
 
