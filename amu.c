@@ -148,7 +148,11 @@ int main(void)
 		{
 			case MENU:
 				draw_finger();
+				draw_logo();
 		}
+
+		//Clear
+		erase();
 	}
 
 	getch();     			// Wait for user input
