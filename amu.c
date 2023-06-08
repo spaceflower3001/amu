@@ -14,6 +14,19 @@
 // Const color
 const short c_hud = 1;
 
+// Game state
+typedef enum 
+{
+	STATE_MENU_FINGER_ANIM,
+	STATE_MENU_TITLE,
+	STATE_CONTROLS,
+	STATE_GAME,
+	STATE_FIN
+} game_state;
+
+// Init current state
+game_state current_state;
+
 // Set color
 void set_color() 
 {
@@ -63,14 +76,22 @@ void draw_finger()
 		refresh();
 
 		// Delay
-		usleep(50000); // 50ms delay
+		usleep(20000); // 50ms delay
 	}
 
 	usleep(100000); // 100ms delay to see finished anim
+
+	erase();
+
+	refresh();
+
+	current_state = STATE_MENU_TITLE;
+	
 }
 
-void draw_logo()
+void draw_title()
 {
+	// ASCII logo
 	const char *logo[4] = 
 	{
 		"  __ _  _ __ ___   _   _ ",
@@ -88,21 +109,11 @@ void draw_logo()
 	{
 		mvprintw(y + i, x, logo[i]);
 	}
-}
 
-// Check next lvl
-/*
-bool next_lvl(short current_lvl[][arr_size_x]) 
-{
-    if (current_lvl[player.y][player.x] == i_exit)
-    {
-        level = level + 1;
-        return true;
-    }
+	// Update screen to display title
+	refresh();
 
-    return false;
 }
-*/
 
 int main(void) 
 {
@@ -116,39 +127,31 @@ int main(void)
 	// If terminal does not support color
 	if (!has_colors()) 
 	{
-		endwin();
+		endwin();		// End ncurses 
 		printf("Your terminal does not support colors. Please enable colors to play this game.\n");
 	}
 
-
-	// Game state
-	typedef enum 
-	{
-        	MENU,
-        	CONTROLS,
-	        GAME,
-        	FIN,
-	} game_state;
-	
 	// Init current state
-	game_state current_state;
-    	current_state = MENU;
-
-	// Draw window border hud
-	attron(COLOR_PAIR(c_hud));
-	box(stdscr, 0, 0);
+	current_state = STATE_MENU_FINGER_ANIM;
 
 	// MAIN LOOP
-	while (current_state != FIN)
+	while (current_state != STATE_FIN)
 	{
 		// Enable color support
 		set_color();
 
+		// Draw window border hud
+		attron(COLOR_PAIR(c_hud));
+		box(stdscr, 0, 0);
+
 		switch(current_state)
 		{
-			case MENU:
+			case STATE_MENU_FINGER_ANIM:
 				draw_finger();
-				draw_logo();
+				break;
+			case STATE_MENU_TITLE:
+				draw_title();
+				break;
 		}
 
 		//Clear
