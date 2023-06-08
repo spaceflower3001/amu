@@ -151,6 +151,12 @@ int main(void)
 				break;
 			case STATE_MENU_TITLE:
 				draw_title();
+				break
+			case STATE_CONTROLS:
+				break;
+			case STATE_GAME;
+				break;
+			case STATE_FIN
 				break;
 		}
 
