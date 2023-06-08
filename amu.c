@@ -17,6 +17,7 @@ const short c_hud = 1;
 // Game state
 typedef enum 
 {
+	TEST,
 	STATE_MENU_FINGER_ANIM,
 	STATE_MENU_TITLE,
 	STATE_CONTROLS,
@@ -86,7 +87,6 @@ void draw_finger()
 	refresh();
 
 	current_state = STATE_MENU_TITLE;
-	
 }
 
 void draw_title()
@@ -115,6 +115,12 @@ void draw_title()
 
 }
 
+void test()
+{
+	printf(" ⁂  ");
+	refresh();
+}
+
 int main(void) 
 {
 	initscr();             		// Initialize ncurses library
@@ -132,7 +138,7 @@ int main(void)
 	}
 
 	// Init current state
-	current_state = STATE_MENU_FINGER_ANIM;
+	current_state = TEST;
 
 	// MAIN LOOP
 	while (current_state != STATE_FIN)
@@ -146,17 +152,20 @@ int main(void)
 
 		switch(current_state)
 		{
+			case TEST:
+				test();	
+				break;
 			case STATE_MENU_FINGER_ANIM:
 				draw_finger();
 				break;
 			case STATE_MENU_TITLE:
 				draw_title();
-				break
+				break;
 			case STATE_CONTROLS:
 				break;
-			case STATE_GAME;
+			case STATE_GAME:
 				break;
-			case STATE_FIN
+			case STATE_FIN:
 				break;
 		}
 
