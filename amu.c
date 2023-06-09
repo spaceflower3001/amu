@@ -10,6 +10,8 @@
 #include <math.h>
 #include <unistd.h>
 #include <ncurses.h>
+#include <locale.h>
+#include <stddef.h>
 
 // Const color
 const short c_hud = 1;
@@ -117,12 +119,26 @@ void draw_title()
 
 void test()
 {
-	printf(" ⁂  ");
+	// Get the screen size
+	int screenRows, screenCols;
+	getmaxyx(stdscr, screenRows, screenCols);
+
+	// Define the string to be printed
+	wchar_t* message = L" ⁂  ";
+	int messageLength = strlen(message);
+
+	// Calculate the coordinates for centering the string
+	int row = screenRows / 2;
+	int col = (screenCols - messageLength) / 2;
+
+	// Print the string at the center of the screen
+	mvaddwstr(row, col, message);
 	refresh();
 }
 
 int main(void) 
 {
+	setlocale(LC_ALL, "");  	// Locale to support wide characters
 	initscr();             		// Initialize ncurses library
 	noecho();    	       		// Don't echo user input
 	cbreak();    	       		// Disable line buffering
@@ -140,6 +156,17 @@ int main(void)
 	// Init current state
 	current_state = TEST;
 
+	// Enable color support
+	set_color();
+
+	// Draw window border hud
+	attron(COLOR_PAIR(c_hud));
+	box(stdscr, 0, 0);
+
+
+	test();
+
+	/*
 	// MAIN LOOP
 	while (current_state != STATE_FIN)
 	{
@@ -172,6 +199,7 @@ int main(void)
 		//Clear
 		erase();
 	}
+	*/
 
 	getch();     			// Wait for user input
 
