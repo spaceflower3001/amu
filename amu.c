@@ -6,6 +6,7 @@
 */
 
 #include <stdio.h>
+#include <wchar.h>
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
@@ -14,7 +15,8 @@
 #include <stddef.h>
 
 // Const color
-const short c_hud = 1;
+const short c_hud  = 4;
+const short c_moon = 8;
 
 // Game state
 typedef enum 
@@ -125,14 +127,14 @@ void test()
 
 	// Define the string to be printed
 	wchar_t* message = L" ⁂  ";
-	int messageLength = strlen(message);
+	int messageLength = wcslen(message);
 
 	// Calculate the coordinates for centering the string
 	int row = screenRows / 2;
 	int col = (screenCols - messageLength) / 2;
 
 	// Print the string at the center of the screen
-	mvaddwstr(row, col, message);
+	mvprintw(row, col, "%ls", message);
 	refresh();
 }
 
