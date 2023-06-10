@@ -24,8 +24,9 @@
 int w, h;
 
 // Const color
-const short c_hud  = 3;
-const short c_moon = 7;
+const short c_hud   = 1;
+const short c_title = 2;
+const short c_moon  = 9;
 
 // Level size
 int current_lvl_x;
@@ -53,7 +54,8 @@ game_state current_state;
 void set_color() 
 {
 	start_color();
-    	init_pair(c_hud,  COLOR_BLUE, COLOR_BLACK);
+    init_pair(c_hud,  COLOR_BLUE, COLOR_BLACK);
+	init_pair(c_title, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(c_moon,  COLOR_YELLOW, COLOR_BLACK);
 }
 
@@ -96,6 +98,8 @@ void draw_finger()
 	// Set up timer
 	timeout(100);
 
+	attron(COLOR_PAIR(c_hud));
+
 	// Loop through each line of the hand gesture
 	for (int i = 0; i < 21; i++) 
 	{
@@ -113,15 +117,19 @@ void draw_finger()
 
 	usleep(100000); // 100ms delay to see finished anim
 
+	attroff(COLOR_PAIR(c_hud));
+
+	current_state = STATE_MENU_TITLE;
+
 	erase();
 
 	refresh();
 
-	current_state = STATE_MENU_TITLE;
 }
 
 void draw_title()
 {
+	
 	// ASCII logo
 	const char *logo[4] = 
 	{
@@ -130,6 +138,8 @@ void draw_title()
 		"| (_| || | | | | || |_| |",
 		" \\__,_||_| |_| |_| \\__,_|"
 	};
+
+	attron(COLOR_PAIR(c_title));
 
 	// Center Title ASCII
 	int y = (LINES - 4) / 2;
@@ -140,6 +150,8 @@ void draw_title()
 	{
 		mvprintw(y + i, x, logo[i]);
 	}
+
+	attroff(COLOR_PAIR(c_title));
 
 	// Update screen to display title
 	refresh();
@@ -153,25 +165,6 @@ void game_over()
     printf("Game Over!\n");
 }
 
-void test()
-{
-	// Get the screen size
-	int x, y;
-	getmaxyx(stdscr, x, y);
-
-	// Define the string to be printed
-	wchar_t* message = L" ⁂  ";
-	int messageLength = wcslen(message);
-
-	// Calculate the coordinates for centering the string
-	int row = x / 2;
-	int col = (y - messageLength) / 2;
-
-	// Print the string at the center of the screen
-	mvprintw(row, col, "%ls", message);
-	refresh();
-}
-
 int main(void) 
 {
 	setlocale(LC_ALL, "");  	// Locale to support wide characters
@@ -179,7 +172,7 @@ int main(void)
 	noecho();    	       		// Don't echo user input
 	cbreak();    	       		// Disable line buffering
 	curs_set(0); 	       		// Hide cursor
-    	keypad(stdscr, TRUE);  		// Enable keypad mode
+    keypad(stdscr, TRUE);  		// Enable keypad mode
 	leaveok(stdscr, TRUE);		// Control cursor behavior between windows
 
 	// If terminal does not support color
@@ -190,16 +183,7 @@ int main(void)
 	}
 
 	// Init current state
-	current_state = TEST;
-
-	// Enable color support
-	set_color();
-
-	// Draw window border hud
-	attron(COLOR_PAIR(c_hud));
-	box(stdscr, 0, 0);
-	attron(COLOR_PAIR(c_hud));
-
+	current_state = STATE_MENU_FINGER_ANIM;
 
 	// MAIN LOOP
 	while (current_state != STATE_END || current_state != STATE_DIE)
