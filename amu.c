@@ -14,11 +14,12 @@
 #include <locale.h>
 #include <stddef.h>
 
+
 // Draw colored instance
 #define td_indent 2 // Top & down ident
 #define symbol_count 3
-
 #define s_moon "o"
+#define t_player "ꆛ웃유"
 
 // Window width & Height
 int w, h;
@@ -65,8 +66,26 @@ void draw_instance(int y, int x, int color, char name[])
 
     mvprintw(y, x, name);
 
+	refresh();
+
     attroff(COLOR_PAIR(color));
 }
+
+/*
+ 	OBJECT 
+*/
+
+// Class
+struct class_obj 
+{
+    char symbol[20];
+    int hsp, vsp;
+    int x, y;
+    int direction;
+};
+
+// Create objects
+struct class_obj player = {};
 
 void draw_finger()
 {
@@ -121,15 +140,16 @@ void draw_finger()
 
 	current_state = STATE_MENU_TITLE;
 
+	// Remove ASCII
 	erase();
 
+	// Update screen
 	refresh();
 
 }
 
 void draw_title()
 {
-	
 	// ASCII logo
 	const char *logo[4] = 
 	{
@@ -183,7 +203,7 @@ int main(void)
 	}
 
 	// Init current state
-	current_state = STATE_MENU_FINGER_ANIM;
+	current_state = TEST;
 
 	// MAIN LOOP
 	while (current_state != STATE_END || current_state != STATE_DIE)
@@ -200,7 +220,7 @@ int main(void)
 		{
 			case TEST:
 				//test();	
-				draw_instance(50, 50, c_moon, s_moon);
+				draw_instance(0, 0, c_moon, t_player);
 				break;
 			case STATE_MENU_FINGER_ANIM:
 				draw_finger();
