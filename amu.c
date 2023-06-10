@@ -14,9 +14,25 @@
 #include <locale.h>
 #include <stddef.h>
 
+// Draw colored instance
+#define td_indent 2 // Top & down ident
+#define symbol_count 3
+
+#define s_moon "o"
+
+// Window width & Height
+int w, h;
+
 // Const color
-const short c_hud  = 4;
-const short c_moon = 8;
+const short c_hud  = 3;
+const short c_moon = 7;
+
+// Level size
+int current_lvl_x;
+int current_lvl_y;
+
+// Const state
+bool EXIT = false;
 
 // Game state
 typedef enum 
@@ -26,7 +42,8 @@ typedef enum
 	STATE_MENU_TITLE,
 	STATE_CONTROLS,
 	STATE_GAME,
-	STATE_FIN
+	STATE_DIE,
+	STATE_END
 } game_state;
 
 // Init current state
@@ -37,6 +54,16 @@ void set_color()
 {
 	start_color();
     	init_pair(c_hud,  COLOR_BLUE, COLOR_BLACK);
+	init_pair(c_moon,  COLOR_YELLOW, COLOR_BLACK);
+}
+
+void draw_instance(int y, int x, int color, char name[]) 
+{
+    attron(COLOR_PAIR(color));
+
+    mvprintw(y, x, name);
+
+    attroff(COLOR_PAIR(color));
 }
 
 void draw_finger()
@@ -116,22 +143,29 @@ void draw_title()
 
 	// Update screen to display title
 	refresh();
+}
 
+// Game Over
+void game_over() 
+{
+    EXIT = true;
+    endwin();
+    printf("Game Over!\n");
 }
 
 void test()
 {
 	// Get the screen size
-	int screenRows, screenCols;
-	getmaxyx(stdscr, screenRows, screenCols);
+	int x, y;
+	getmaxyx(stdscr, x, y);
 
 	// Define the string to be printed
 	wchar_t* message = L" ⁂  ";
 	int messageLength = wcslen(message);
 
 	// Calculate the coordinates for centering the string
-	int row = screenRows / 2;
-	int col = (screenCols - messageLength) / 2;
+	int row = x / 2;
+	int col = (y - messageLength) / 2;
 
 	// Print the string at the center of the screen
 	mvprintw(row, col, "%ls", message);
@@ -164,13 +198,11 @@ int main(void)
 	// Draw window border hud
 	attron(COLOR_PAIR(c_hud));
 	box(stdscr, 0, 0);
+	attron(COLOR_PAIR(c_hud));
 
 
-	test();
-
-	/*
 	// MAIN LOOP
-	while (current_state != STATE_FIN)
+	while (current_state != STATE_END || current_state != STATE_DIE)
 	{
 		// Enable color support
 		set_color();
@@ -178,11 +210,13 @@ int main(void)
 		// Draw window border hud
 		attron(COLOR_PAIR(c_hud));
 		box(stdscr, 0, 0);
+		attron(COLOR_PAIR(c_hud));
 
 		switch(current_state)
 		{
 			case TEST:
-				test();	
+				//test();	
+				draw_instance(50, 50, c_moon, s_moon);
 				break;
 			case STATE_MENU_FINGER_ANIM:
 				draw_finger();
@@ -194,14 +228,13 @@ int main(void)
 				break;
 			case STATE_GAME:
 				break;
-			case STATE_FIN:
+			case STATE_END:
 				break;
 		}
 
 		//Clear
 		erase();
 	}
-	*/
 
 	getch();     			// Wait for user input
 
