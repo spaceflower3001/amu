@@ -14,27 +14,32 @@
 #include <locale.h>
 #include <stddef.h>
 
+#define s_player "ꆛ웃유"
 
-// Draw colored instance
-#define td_indent 2 // Top & down ident
-#define symbol_count 3
-#define s_moon "o"
-#define t_player "ꆛ웃유"
+// Map
+short arr_size_x;
+#define s_floor "-------"
+
+// index map object
+#define i_floor   1
+#define i_space  4
+#define i_exit   6
 
 // Window width & Height
 int w, h;
 
-// Const color
-const short c_hud   = 1;
-const short c_title = 2;
-const short c_moon  = 3;
-const short c_space = 3;
-const short c_islands = 4;
-const short c_industry = 3;
+// Key
+int key_pressed = 0;
 
-// Level size
-int current_lvl_x;
-int current_lvl_y;
+// Const color
+const short c_floor    = 0;
+const short c_industry = 0;
+const short c_space    = 0;
+const short c_hud      = 1;
+const short c_title    = 2;
+const short c_player   = 3;
+const short c_moon     = 3;
+const short c_islands  = 4;
 
 // Const state
 bool EXIT = false;
@@ -42,7 +47,7 @@ bool EXIT = false;
 // Game state
 typedef enum 
 {
-	TEST,
+	STATE_TEST,
 	STATE_MENU_FINGER_ANIM,
 	STATE_MENU_TITLE,
 	STATE_CONTROLS,
@@ -60,23 +65,9 @@ typedef enum
 	LVL_INDUSTRY
 } lvl_state;
 
-// Init current game state
+// Init states
 game_state current_game_state;
-
-// Init current level state
 lvl_state current_level_state;
-
-// Class
-struct class_obj 
-{
-    char symbol[20];
-    int hsp, vsp;
-    int x, y;
-    int direction;
-};
-
-// Create objects
-struct class_obj player = {};
 
 // Set color
 void set_color() 
@@ -195,7 +186,7 @@ void game_over()
 {
     EXIT = true;
     endwin();
-    printf("Game Over!\n");
+    
 }
 
 int main(void) 
@@ -216,7 +207,7 @@ int main(void)
 	}
 
 	// Init current state
-	current_game_state = TEST;
+	current_game_state = STATE_TEST;
 
 	// MAIN LOOP
 	while (current_game_state != STATE_END || current_game_state != STATE_DIE)
@@ -227,13 +218,11 @@ int main(void)
 		// Draw window border hud
 		attron(COLOR_PAIR(c_hud));
 		box(stdscr, 0, 0);
-		attron(COLOR_PAIR(c_hud));
 
 		switch(current_game_state)
 		{
-			case TEST:
-				//test();	
-				draw_instance(0, 0, c_moon, t_player);
+			case STATE_TEST:
+				draw_instance(10, 10, c_player, s_player);
 				break;
 			case STATE_MENU_FINGER_ANIM:
 				draw_finger();
