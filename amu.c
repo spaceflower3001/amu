@@ -27,7 +27,10 @@ int w, h;
 // Const color
 const short c_hud   = 1;
 const short c_title = 2;
-const short c_moon  = 9;
+const short c_moon  = 3;
+const short c_space = 3;
+const short c_islands = 4;
+const short c_industry = 3;
 
 // Level size
 int current_lvl_x;
@@ -82,6 +85,9 @@ void set_color()
     init_pair(c_hud,  COLOR_BLUE, COLOR_BLACK);
 	init_pair(c_title, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(c_moon,  COLOR_YELLOW, COLOR_BLACK);
+	init_pair(c_space, COLOR_WHITE, COLOR_BLACK);
+	init_pair(c_islands, COLOR_GREEN, COLOR_BLACK);
+	init_pair(c_industry, COLOR_WHITE, COLOR_BLACK);
 }
 
 void draw_instance(int y, int x, int color, char name[]) 
