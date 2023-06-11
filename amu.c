@@ -48,8 +48,32 @@ typedef enum
 	STATE_END
 } game_state;
 
-// Init current state
-game_state current_state;
+typedef enum
+{
+	LVL_TEST,
+	LVL_MOON,
+	LVL_SPACE,
+	LVL_ISLANDS,
+	LVL_INDUSTRY
+} lvl_state;
+
+// Init current game state
+game_state current_game_state;
+
+// Init current level state
+lvl_state current_level_state;
+
+// Class
+struct class_obj 
+{
+    char symbol[20];
+    int hsp, vsp;
+    int x, y;
+    int direction;
+};
+
+// Create objects
+struct class_obj player = {};
 
 // Set color
 void set_color() 
@@ -70,22 +94,6 @@ void draw_instance(int y, int x, int color, char name[])
 
     attroff(COLOR_PAIR(color));
 }
-
-/*
- 	OBJECT 
-*/
-
-// Class
-struct class_obj 
-{
-    char symbol[20];
-    int hsp, vsp;
-    int x, y;
-    int direction;
-};
-
-// Create objects
-struct class_obj player = {};
 
 void draw_finger()
 {
@@ -138,7 +146,7 @@ void draw_finger()
 
 	attroff(COLOR_PAIR(c_hud));
 
-	current_state = STATE_MENU_TITLE;
+	current_game_state = STATE_MENU_TITLE;
 
 	// Remove ASCII
 	erase();
@@ -177,7 +185,6 @@ void draw_title()
 	refresh();
 }
 
-// Game Over
 void game_over() 
 {
     EXIT = true;
@@ -203,10 +210,10 @@ int main(void)
 	}
 
 	// Init current state
-	current_state = TEST;
+	current_game_state = TEST;
 
 	// MAIN LOOP
-	while (current_state != STATE_END || current_state != STATE_DIE)
+	while (current_game_state != STATE_END || current_game_state != STATE_DIE)
 	{
 		// Enable color support
 		set_color();
@@ -216,7 +223,7 @@ int main(void)
 		box(stdscr, 0, 0);
 		attron(COLOR_PAIR(c_hud));
 
-		switch(current_state)
+		switch(current_game_state)
 		{
 			case TEST:
 				//test();	
