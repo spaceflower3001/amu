@@ -14,31 +14,8 @@
 #include <locale.h>
 #include <stddef.h>
 
-#define s_player "ꆛ웃유"
-
-// Map
-short arr_size_x;
-#define s_floor "-------"
-
-// Index map object
-#define i_floor  1
-#define i_space  4
-
-// Window width & Height
-int w, h;
-
-// Game global var
-short level = 0;
-short lifes = 3;
-int dir_x;
-int dir_y;
-
-// Level size
-int current_lvl_x;
-int current_lvl_y;
-
-// Key
-int key_pressed = 0;
+// Define symbol
+#define s_player "ꆛ ꐕ ꆜ"
 
 // Const color
 const short c_floor    = 0;
@@ -65,6 +42,7 @@ typedef enum
 	STATE_END
 } game_state;
 
+// Lvl state
 typedef enum
 {
 	LVL_TEST,
@@ -78,161 +56,62 @@ typedef enum
 game_state current_game_state;
 lvl_state current_level_state;
 
-// Class
-struct class_obj
+// Player position
+int playerX = 0;
+int playerY = 0;
+
+// Game world dimensions
+const int worldWidth = 100;
+const int worldHeight = 100;
+
+void draw_instance(int y, int x, int color, char name[]) 
 {
-	int x, y;
-	int hsp, vsp;
-	int dir;
-	char symbol[0];
-};
+    attron(COLOR_PAIR(color));
 
-// Create objects
-struct class_obj player = {};
+    mvprintw(y, x, name);
 
-void player_move(int key) 
+	refresh();
+
+    attroff(COLOR_PAIR(color));
+}
+
+// Function to handle player movement
+void move_player(int dx, int dy) 
 {
-	// Key check
-	int key_left  = ( key == KEY_LEFT  ) ? 1 : 0;
-	int key_right = ( key == KEY_RIGHT ) ? 1 : 0;
-	int key_down  = ( key == KEY_DOWN  ) ? 1 : 0;
-	int key_up    = ( key == KEY_UP    ) ? 1 : 0;
+    int newX = playerX + dx;
+    int newY = playerY + dy;
 
-	// key dir
-	dir_x = key_right - key_left;
-	dir_y = key_down  - key_up;
+    // Check y or x
+    if (newX >= 0)
+        playerX = newX;
+    if (newY >= 0)
+        playerY = newY;	
+}
 
-	// Animation and direction shoot
-    if (dir_x == 0 && dir_y == 0)
-    {
-        strcpy(player.symbol, "|0|");
-    }
-    else
-    {
-        if (dir_x == 1)
-        {
-            strcpy(player.symbol, "|0>");
-        }
-        if (dir_x == -1)
-        {
-            strcpy(player.symbol, "<0|");
-        }
-        if (dir_y == -1)
-        {
-            strcpy(player.symbol, "/0\\");
-        }
-        if (dir_y == 1)
-        {
-            strcpy(player.symbol, "\\0/");
-        }
-    }
-
-	player.hsp = 1 * dir_x;
-	player.vsp = 1 * dir_y;
-
-	if (player.hsp != 0) 
+void player_input()
+{
+	int ch;
+	// Handle player movement based on Vim bindings
+	while ((ch = getch()) != 'q')
 	{
-		player.vsp = 0;
-	} 
-	else if (player.vsp != 0) 
-	{
-		player.hsp = 0;
+		refresh();
+		switch (ch) 
+		{
+			case 'h':
+				move_player(-1, 0);
+				break;
+			case 'j':
+				move_player(0, 1);
+				break;
+			case 'k':
+				move_player(0, -1);
+				break;
+			case 'l':
+				move_player(1, 0);
+				break;
+		}
+		draw_instance(playerY, playerX, c_player, s_player);
 	}
-
-	player.x += player.hsp;
-	player.y += player.vsp;
-}
-
-// LVL
-#define lvl_zero_x 27
-#define lvl_zero_y 20
-#define level_zero_size lvl_zero_x
-short lvl_zero[lvl_zero_y][lvl_zero_x] = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 3, 3, 1},
-    {1, 0, 0, 2, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 6, 6, 1}};
-
-// Draw Current Level
-void draw_level(short lvl[][arr_size_x])
-{
-    for (int y = 0; y < current_lvl_y; y++)
-    {
-        for (int x = 0; x < current_lvl_x; x++)
-        {
-            switch (lvl[y][x])
-            {
-
-            // Draw dynamic object
-            default:
-
-                // Draw player
-                if (x == player.x && y == player.y)
-                {
-                    draw_instance(y, x, c_player, player.symbol);
-                    break;
-                }
-
-                break;
-            }
-        }
-    }
-}
-
-// Init lvl
-void level_init(short index_lvl)
-{
-    static bool init = true;
-
-    if (!init)
-    {
-        if (index_lvl == 1)
-        {
-            init = next_lvl(lvl_zero);
-            game_update(key_pressed, lvl_zero);
-        }
-        return;
-    }
-
-    switch (index_lvl)
-    {
-    case 0:
-        player.x = 8;
-        player.y = 16;
-        current_lvl_x = lvl_zero_x;
-        current_lvl_y = lvl_zero_y;
-        arr_size_x = level_zero_size;
-        clear_enemy();
-        set_lvl_param(lvl_zero, current_lvl_x, current_lvl_y);
-        init = false;
-        break;
-    }
-}
-
-// Update game
-void game_update(int key, short current_lvl[]) 
-{
-    // Player
-    player_move(key);
-
-	// Draw map
-    draw_level(current_lvl);
 }
 
 // Set color
@@ -245,17 +124,6 @@ void set_color()
 	init_pair(c_space, COLOR_WHITE, COLOR_BLACK);
 	init_pair(c_islands, COLOR_GREEN, COLOR_BLACK);
 	init_pair(c_industry, COLOR_WHITE, COLOR_BLACK);
-}
-
-void draw_instance(int y, int x, int color, char name[]) 
-{
-    attron(COLOR_PAIR(color));
-
-    mvprintw(y, x, name);
-
-	refresh();
-
-    attroff(COLOR_PAIR(color));
 }
 
 void draw_finger()
@@ -352,7 +220,6 @@ void game_over()
 {
     EXIT = true;
     endwin();
-    
 }
 
 int main(void) 
@@ -361,7 +228,7 @@ int main(void)
 	initscr();             		// Initialize ncurses library
 	noecho();    	       		// Don't echo user input
 	cbreak();    	       		// Disable line buffering
-	curs_set(0); 	       		// Hide cursor
+	curs_set(FALSE); 	       	// Hide cursor
     keypad(stdscr, TRUE);  		// Enable keypad mode
 	leaveok(stdscr, TRUE);		// Control cursor behavior between windows
 
@@ -384,11 +251,12 @@ int main(void)
 		// Draw window border hud
 		attron(COLOR_PAIR(c_hud));
 		box(stdscr, 0, 0);
+		attron(COLOR_PAIR(c_hud));
 
 		switch(current_game_state)
 		{
 			case STATE_TEST:
-				level_init(level);
+				player_input();
 				break;
 			case STATE_MENU_FINGER_ANIM:
 				draw_finger();
