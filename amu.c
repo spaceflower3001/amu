@@ -1,5 +1,5 @@
-/* 	
- 	~ 2023
+/*
+	~ 2023
 	~ spaceflower3001
 	~ GNU GPLv3
 	~ spaceflower3001@gmail.com
@@ -17,21 +17,25 @@
 // Define symbol
 #define s_player "ꆛ ꐕ ꆜ"
 
+#define WIDTH 30
+#define HEIGHT 10
+
+
 // Const color
-const short c_floor    = 0;
+const short c_floor = 0;
 const short c_industry = 0;
-const short c_space    = 0;
-const short c_hud      = 1;
-const short c_title    = 2;
-const short c_player   = 3;
-const short c_moon     = 3;
-const short c_islands  = 4;
+const short c_space = 0;
+const short c_hud = 1;
+const short c_title = 2;
+const short c_player = 3;
+const short c_moon = 3;
+const short c_islands = 4;
 
 // Const state
 bool EXIT = false;
 
 // Game state
-typedef enum 
+typedef enum
 {
 	STATE_TEST,
 	STATE_MENU_FINGER_ANIM,
@@ -56,71 +60,93 @@ typedef enum
 game_state current_game_state;
 lvl_state current_level_state;
 
-// Player position
-int playerX = 0;
-int playerY = 0;
+WINDOW *win;
 
-// Game world dimensions
-const int worldWidth = 100;
-const int worldHeight = 100;
-
-void draw_instance(int y, int x, int color, char name[]) 
+void draw_instance(int y, int x, int color, char name[])
 {
-    attron(COLOR_PAIR(color));
+	attron(COLOR_PAIR(color));
 
-    mvprintw(y, x, name);
+	mvprintw(y, x, name);
 
 	refresh();
 
-    attroff(COLOR_PAIR(color));
+	attroff(COLOR_PAIR(color));
 }
 
-// Function to handle player movement
-void move_player(int dx, int dy) 
+void player()
 {
-    int newX = playerX + dx;
-    int newY = playerY + dy;
+	// Player position
+	int playerX = 0;
+	int playerY = 0;
 
-    // Check y or x
-    if (newX >= 0)
-        playerX = newX;
-    if (newY >= 0)
-        playerY = newY;	
-}
+	int isJumping = 0;
+    int jumpHeight = 5;
+    int jumpCount = 0;
 
-void player_input()
-{
 	int ch;
 	// Handle player movement based on Vim bindings
 	while ((ch = getch()) != 'q')
 	{
+		clear();
 		refresh();
-		switch (ch) 
+
+		if (!isJumping && playerY < HEIGHT - 1)
+        {
+            playerY++;
+        }
+
+		switch (ch)
 		{
 			case 'h':
-				move_player(-1, 0);
-				break;
-			case 'j':
-				move_player(0, 1);
+				playerX--;
 				break;
 			case 'k':
-				move_player(0, -1);
+				if (!isJumping)
+            	{
+                	isJumping = 1;
+                	jumpCount = 0;
+            	}
 				break;
 			case 'l':
-				move_player(1, 0);
+				playerX++;
 				break;
 		}
+
+        if (isJumping)
+        {
+            jumpCount++;
+            if (jumpCount <= jumpHeight)
+            {
+                playerY--;
+            }
+            else if (jumpCount <= 2 * jumpHeight)
+            {
+            	playerY++;
+            }
+            else
+            {
+                isJumping = 0;
+            }
+        }
+
 		draw_instance(playerY, playerX, c_player, s_player);
+
+		wrefresh(win);
+
+        if (playerY >= HEIGHT)
+        {
+            break;
+        }
 	}
 }
 
 // Set color
-void set_color() 
+void set_color()
 {
 	start_color();
-    init_pair(c_hud,  COLOR_BLUE, COLOR_BLACK);
+	init_pair(c_hud, COLOR_BLUE, COLOR_BLACK);
 	init_pair(c_title, COLOR_MAGENTA, COLOR_BLACK);
-	init_pair(c_moon,  COLOR_YELLOW, COLOR_BLACK);
+	init_pair(c_moon, COLOR_YELLOW, COLOR_BLACK);
 	init_pair(c_space, COLOR_WHITE, COLOR_BLACK);
 	init_pair(c_islands, COLOR_GREEN, COLOR_BLACK);
 	init_pair(c_industry, COLOR_WHITE, COLOR_BLACK);
@@ -129,29 +155,28 @@ void set_color()
 void draw_finger()
 {
 	const char *finger[21] =
-	{
-		"				     .",                                                                   
-		"				    :==-",                                                                  
-		"				  :=++==-.",                                                                
-		"			       .::-::::::::",                                                              
-		"			  ....:::::.    ..::.",                                                             
-		"		     .:==-::::::-:::..  .:::-.",                                                           
-		"		   :=**++++=------::::..::::",                                                          
-		"		 -**#*+++*++=-==---:::--::.",                                                            
-		"	       -###**+++**++==========---.",
-		"	     :*###*+++++++=--+===---===-.",                                                                
-		"	   -*##**##**++=-...-.   :--=-.",                                                               
-		"	 .*##****+***+=: .:::    .--.",                                                                 
-		"	-##+++=:  +**+-:-=-:.:-:.::",                                                                   
-		"       +*+++:    +#*+=-+++=-=++==+:",                                                                      
-		"     .**==-      :**++***++***++=.:",                                                                    
-		"     .+=-.         :--. -+=-.::.",                                                                      
-		" ........",                                                                             
-		" .------:",                                                                                                    
-		" .-ENTER:",                                                                                                      
-		" :------:",                                                                                                     
-		" ::::::::"
-	};
+		{
+			"				     .",
+			"				    :==-",
+			"				  :=++==-.",
+			"			       .::-::::::::",
+			"			  ....:::::.    ..::.",
+			"		     .:==-::::::-:::..  .:::-.",
+			"		   :=**++++=------::::..::::",
+			"		 -**#*+++*++=-==---:::--::.",
+			"	       -###**+++**++==========---.",
+			"	     :*###*+++++++=--+===---===-.",
+			"	   -*##**##**++=-...-.   :--=-.",
+			"	 .*##****+***+=: .:::    .--.",
+			"	-##+++=:  +**+-:-=-:.:-:.::",
+			"       +*+++:    +#*+=-+++=-=++==+:",
+			"     .**==-      :**++***++***++=.:",
+			"     .+=-.         :--. -+=-.::.",
+			" ........",
+			" .------:",
+			" .-ENTER:",
+			" :------:",
+			" ::::::::"};
 
 	// Set up timer
 	timeout(100);
@@ -159,7 +184,7 @@ void draw_finger()
 	attron(COLOR_PAIR(c_hud));
 
 	// Loop through each line of the hand gesture
-	for (int i = 0; i < 21; i++) 
+	for (int i = 0; i < 21; i++)
 	{
 		// Center Finger ASCII
 		int y = (LINES - 21) / 2;
@@ -184,19 +209,17 @@ void draw_finger()
 
 	// Update screen
 	refresh();
-
 }
 
 void draw_title()
 {
 	// ASCII logo
-	const char *logo[4] = 
-	{
-		"  __ _  _ __ ___   _   _ ",
-		" / _` || '_ ` _ | | | | |",
-		"| (_| || | | | | || |_| |",
-		" \\__,_||_| |_| |_| \\__,_|"
-	};
+	const char *logo[4] =
+		{
+			"  __ _  _ __ ___   _   _ ",
+			" / _` || '_ ` _ | | | | |",
+			"| (_| || | | | | || |_| |",
+			" \\__,_||_| |_| |_| \\__,_|"};
 
 	attron(COLOR_PAIR(c_title));
 
@@ -205,7 +228,7 @@ void draw_title()
 	int x = (COLS - 25) / 2;
 
 	// Print title
-	for (int i = 0; i < 4; i++) 
+	for (int i = 0; i < 4; i++)
 	{
 		mvprintw(y + i, x, logo[i]);
 	}
@@ -216,31 +239,34 @@ void draw_title()
 	refresh();
 }
 
-void game_over() 
+void game_over()
 {
-    EXIT = true;
-    endwin();
+	EXIT = true;
+	endwin();
 }
 
-int main(void) 
+int main(void)
 {
-	setlocale(LC_ALL, "");  	// Locale to support wide characters
-	initscr();             		// Initialize ncurses library
-	noecho();    	       		// Don't echo user input
-	cbreak();    	       		// Disable line buffering
-	curs_set(FALSE); 	       	// Hide cursor
-    keypad(stdscr, TRUE);  		// Enable keypad mode
-	leaveok(stdscr, TRUE);		// Control cursor behavior between windows
+	setlocale(LC_ALL, ""); // Locale to support wide characters
+	initscr();			   // Initialize ncurses library
+	noecho();			   // Don't echo user input
+	cbreak();			   // Disable line buffering
+	curs_set(FALSE);	   // Hide cursor
+	keypad(stdscr, TRUE);  // Enable keypad mode
+	leaveok(stdscr, TRUE); // Control cursor behavior between windows
 
 	// If terminal does not support color
-	if (!has_colors()) 
+	if (!has_colors())
 	{
-		endwin();		// End ncurses 
+		endwin(); // End ncurses
 		printf("Your terminal does not support colors. Please enable colors to play this game.\n");
 	}
 
 	// Init current state
 	current_game_state = STATE_TEST;
+
+	win = newwin(HEIGHT, WIDTH, 0, 0);
+    nodelay(win, TRUE);
 
 	// MAIN LOOP
 	while (current_game_state != STATE_END || current_game_state != STATE_DIE)
@@ -253,10 +279,10 @@ int main(void)
 		box(stdscr, 0, 0);
 		attron(COLOR_PAIR(c_hud));
 
-		switch(current_game_state)
+		switch (current_game_state)
 		{
 			case STATE_TEST:
-				player_input();
+				player();
 				break;
 			case STATE_MENU_FINGER_ANIM:
 				draw_finger();
@@ -272,13 +298,13 @@ int main(void)
 				break;
 		}
 
-		//Clear
+		// Clear
 		erase();
 	}
 
-	getch();     			// Wait for user input
+	getch(); // Wait for user input
 
-	endwin();    			// End ncurses
+	endwin(); // End ncurses
 
 	return 0;
 }
