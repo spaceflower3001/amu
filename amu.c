@@ -17,9 +17,12 @@
 // Define symbol
 #define s_player "ꆛ ꐕ ꆜ"
 
-#define WIDTH 30
-#define HEIGHT 10
+// Level size
+int current_lvl_x = 27;
+int current_lvl_y = 20;
 
+// Window width & Height
+int w, h;
 
 // Const color
 const short c_floor = 0;
@@ -42,7 +45,7 @@ typedef enum
 	STATE_MENU_TITLE,
 	STATE_CONTROLS,
 	STATE_GAME,
-	STATE_DIE,
+	STATE_DEATH,
 	STATE_END
 } game_state;
 
@@ -60,13 +63,29 @@ typedef enum
 game_state current_game_state;
 lvl_state current_level_state;
 
-WINDOW *win;
+// Draw colored instance
+#define td_indent 2 // Top & down ident
+#define symbol_count 3
 
 void draw_instance(int y, int x, int color, char name[])
 {
 	attron(COLOR_PAIR(color));
 
-	mvprintw(y, x, name);
+	//mvprintw(y, x, name);
+
+	// Win offset
+    int win_xoffset = w/2;
+    int win_yoffset = h/2;
+    
+    // Level offset
+    int lvl_xoffset = (current_lvl_x/2)*symbol_count+(current_lvl_x%2);
+    int lvl_yoffset = (current_lvl_y+(td_indent*2))/2-(1 /* +1 indent hud */+(current_lvl_y%2));
+
+    mvprintw(
+        /* Y pos */ ceil(win_yoffset - lvl_yoffset) + (y+td_indent), 
+        /* X pos */ ceil(win_xoffset - lvl_xoffset) + (x*symbol_count), 
+        /* S pos */ name
+    );
 
 	refresh();
 
@@ -80,7 +99,7 @@ void player()
 	int playerY = 0;
 
 	int isJumping = 0;
-    int jumpHeight = 5;
+    int jumpHeight = 2;
     int jumpCount = 0;
 
 	int ch;
@@ -90,7 +109,7 @@ void player()
 		clear();
 		refresh();
 
-		if (!isJumping && playerY < HEIGHT - 1)
+		if (!isJumping && playerY < current_lvl_y - 1)
         {
             playerY++;
         }
@@ -98,7 +117,8 @@ void player()
 		switch (ch)
 		{
 			case 'h':
-				playerX--;
+				if (playerX > 0)
+					playerX--;	
 				break;
 			case 'k':
 				if (!isJumping)
@@ -108,7 +128,8 @@ void player()
             	}
 				break;
 			case 'l':
-				playerX++;
+				if (playerX < current_lvl_x - 1)
+					playerX++;
 				break;
 		}
 
@@ -131,9 +152,7 @@ void player()
 
 		draw_instance(playerY, playerX, c_player, s_player);
 
-		wrefresh(win);
-
-        if (playerY >= HEIGHT)
+        if (playerY >= current_lvl_y)
         {
             break;
         }
@@ -265,11 +284,10 @@ int main(void)
 	// Init current state
 	current_game_state = STATE_TEST;
 
-	win = newwin(HEIGHT, WIDTH, 0, 0);
-    nodelay(win, TRUE);
+    getmaxyx(stdscr, h, w);
 
 	// MAIN LOOP
-	while (current_game_state != STATE_END || current_game_state != STATE_DIE)
+	while (current_game_state != STATE_END || current_game_state != STATE_DEATH)
 	{
 		// Enable color support
 		set_color();
