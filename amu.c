@@ -18,7 +18,7 @@
 #define s_player "ꆛ ꐕ ꆜ"
 
 // Level size
-int current_lvl_x = 27;
+int current_lvl_x = 100000;
 int current_lvl_y = 20;
 
 // Window width & Height
@@ -63,29 +63,11 @@ typedef enum
 game_state current_game_state;
 lvl_state current_level_state;
 
-// Draw colored instance
-#define td_indent 2 // Top & down ident
-#define symbol_count 3
-
 void draw_instance(int y, int x, int color, char name[])
 {
 	attron(COLOR_PAIR(color));
 
-	//mvprintw(y, x, name);
-
-	// Win offset
-    int win_xoffset = w/2;
-    int win_yoffset = h/2;
-    
-    // Level offset
-    int lvl_xoffset = (current_lvl_x/2)*symbol_count+(current_lvl_x%2);
-    int lvl_yoffset = (current_lvl_y+(td_indent*2))/2-(1 /* +1 indent hud */+(current_lvl_y%2));
-
-    mvprintw(
-        /* Y pos */ ceil(win_yoffset - lvl_yoffset) + (y+td_indent), 
-        /* X pos */ ceil(win_xoffset - lvl_xoffset) + (x*symbol_count), 
-        /* S pos */ name
-    );
+	mvprintw(y, x, name);
 
 	refresh();
 
@@ -95,21 +77,21 @@ void draw_instance(int y, int x, int color, char name[])
 void player()
 {
 	// Player position
-	int playerX = 0;
-	int playerY = 0;
+	int player_x = 0;
+	int player_y = 0;
 
-	int isJumping = 0;
-    int jumpHeight = 2;
-    int jumpCount = 0;
+	int is_jumping = 0;
+	int jump_height = 1;
+	int jump_count = 0;
 
 	int ch;
 	// Handle player movement based on Vim bindings
 	while ((ch = getch()) != 'q')
 	{
-		clear();
+		//clear();
 		refresh();
 
-		if (!isJumping && playerY < current_lvl_y - 1)
+		if (!is_jumping && playerY < current_lvl_y - 1)
         {
             playerY++;
         }
@@ -117,23 +99,23 @@ void player()
 		switch (ch)
 		{
 			case 'h':
-				if (playerX > 0)
+				if (playerX < current_lvl_x)
 					playerX--;	
 				break;
 			case 'k':
-				if (!isJumping)
+				if (!is_jumping)
             	{
-                	isJumping = 1;
+                	is_jumping = 1;
                 	jumpCount = 0;
             	}
 				break;
 			case 'l':
-				if (playerX < current_lvl_x - 1)
+				if (playerX < current_lvl_x)
 					playerX++;
 				break;
 		}
 
-        if (isJumping)
+        if (is_jumping)
         {
             jumpCount++;
             if (jumpCount <= jumpHeight)
@@ -146,17 +128,17 @@ void player()
             }
             else
             {
-                isJumping = 0;
+                is_jumping = 0;
             }
         }
 
-		draw_instance(playerY, playerX, c_player, s_player);
+	draw_instance(playerY, playerX, c_player, s_player);
 
         if (playerY >= current_lvl_y)
         {
             break;
         }
-	}
+	
 }
 
 // Set color
@@ -234,11 +216,12 @@ void draw_title()
 {
 	// ASCII logo
 	const char *logo[4] =
-		{
-			"  __ _  _ __ ___   _   _ ",
-			" / _` || '_ ` _ | | | | |",
-			"| (_| || | | | | || |_| |",
-			" \\__,_||_| |_| |_| \\__,_|"};
+	{
+		"  __ _  _ __ ___   _   _ ",
+		" / _` || '_ ` _ | | | | |",
+		"| (_| || | | | | || |_| |",
+		" \\__,_||_| |_| |_| \\__,_|"
+	};
 
 	attron(COLOR_PAIR(c_title));
 
@@ -284,7 +267,7 @@ int main(void)
 	// Init current state
 	current_game_state = STATE_TEST;
 
-    getmaxyx(stdscr, h, w);
+	getmaxyx(stdscr, h, w);
 
 	// MAIN LOOP
 	while (current_game_state != STATE_END || current_game_state != STATE_DEATH)
@@ -300,7 +283,7 @@ int main(void)
 		switch (current_game_state)
 		{
 			case STATE_TEST:
-				player();
+				draw_title();	
 				break;
 			case STATE_MENU_FINGER_ANIM:
 				draw_finger();
